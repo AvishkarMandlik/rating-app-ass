@@ -18,7 +18,10 @@ const findById         = (id)             => pool.query('SELECT * FROM users WHE
 const countByRole      = ()               => pool.query(`SELECT role, COUNT(*) AS total FROM users GROUP BY role`);
 const insert           = (u)              =>
   pool.query(`INSERT INTO users(name,email,address,password,role) VALUES (?,?,?,?,?)`, [u.name,u.email,u.address,u.password,u.role]);
-const listUsers        = (q)              => pool.query(`SELECT * FROM users ${q}`);
+const listUsers = ([whereClause, values]) => {
+  const sql = `SELECT * FROM users ${whereClause}`;
+  return pool.query(sql, values);
+};
 const updatePassword   = (id, hash)       => pool.query(`UPDATE users SET password=? WHERE id=?`, [hash,id]);
 
 module.exports = { createTable, findByEmail, findById, insert, listUsers, countByRole, updatePassword };

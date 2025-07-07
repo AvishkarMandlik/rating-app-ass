@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 
 exports.changePassword = async (req, res) => {
   const errors = validationResult(req);
@@ -18,15 +19,20 @@ exports.changePassword = async (req, res) => {
 
 exports.listUsers = async (req, res) => {
   const { name = '', email = '', address = '', role = '' } = req.query;
+
   try {
-    const where = `
-      WHERE name   LIKE ? AND
-            email  LIKE ? AND
-            address LIKE ? AND
-            role   LIKE ?`;
-    const [rows] = await User.listUsers([where, [`%${name}%`, `%${email}%`, `%${address}%`, `%${role}%`]]);
+    let where = `WHERE name LIKE ? AND email LIKE ? AND address LIKE ?`;
+    const values = [`%${name}%`, `%${email}%`, `%${address}%`];
+
+    if (role) {
+      where += ` AND role LIKE ?`;
+      values.push(`%${role}%`);
+    }
+
+    const [rows] = await User.listUsers([where, values]);
     res.json(rows);
   } catch (err) {
+    console.error("❌ listUsers failed:", err.message);
     res.status(500).json({ error: err.message });
   }
 };

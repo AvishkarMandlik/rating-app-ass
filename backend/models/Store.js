@@ -14,7 +14,8 @@ const createTable = async () => {
 };
 
 const insert         = (s) => pool.query(`INSERT INTO stores(name,email,address,owner_id) VALUES (?,?,?,?)`, [s.name,s.email,s.address,s.owner_id]);
-const listStores     = (q) => pool.query(`SELECT * FROM stores ${q}`);
+const listStores = (query, params) =>
+  pool.query(`SELECT * FROM stores ${query}`, params);
 const storeById      = (id)=> pool.query(`SELECT * FROM stores WHERE id=?`, [id]);
 const countStores    = ()  => pool.query(`SELECT COUNT(*) AS total FROM stores`);
 
